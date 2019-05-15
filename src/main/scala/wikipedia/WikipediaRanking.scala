@@ -46,14 +46,24 @@ object WikipediaRanking {
    *   several seconds.
    */
   def rankLangs(langs: List[String], rdd: RDD[WikipediaArticle]): List[(String, Int)] = {
-    langs.map(lang => (lang, occurrencesOfLang(lang, rdd))).sortBy(_._2).reverse
+    val res = langs
+      .map(lang => (lang, occurrencesOfLang(lang, rdd)))
+      .sortBy(_._2)
+      .reverse
+    res
   }
 
   /* Compute an inverted index of the set of articles, mapping each language
    * to the Wikipedia pages in which it occurs.
    */
   def makeIndex(langs: List[String], rdd: RDD[WikipediaArticle]): RDD[(String, Iterable[WikipediaArticle])] = {
-    val eee = 
+    val res = rdd
+      .map(article => article.text.split(" ")
+        .filter(w => langs.contains(w))
+        .map(w => (w, article)))
+      .flatMap(it => it)
+      .groupByKey()
+    res
   }
 
   /* (2) Compute the language ranking again, but now using the inverted index. Can you notice
