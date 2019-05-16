@@ -1,11 +1,13 @@
 
-# Spark with Scala study
+# Wikipedia Word Count
 
-## Wikipedia Word Count
+빅데이터 학습 1주차 결과
+
+## Coursera - 1주차 과제 (Wikipedia Word Count)
 
 wikipedia 텍스트 데이터로부터 프로그래밍 언어 이름들의 빈도를 세는 Spark 프로그램 구현 과제를 수행한다
 
-아래 경로에서 wikipedia 데이터를 다운받아 src/main/resources/wikipedia 디렉토리에 저장한다
+아래 경로에서 wikipedia 데이터를 다운받아 src/main/resources/wikipedia 디렉토리에 저장한
 
 - task url : https://www.coursera.org/learn/scala-spark-big-data/programming/CfQX2/wikipedia
 - wikipedia data : http://alaska.epfl.ch/~dockermoocs/bigdata/wikipedia.dat
