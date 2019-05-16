@@ -120,12 +120,22 @@ object WikipediaRanking {
 
     println(">> langsRanked:")
     println(langsRanked)
-
     println(">> langsRanked2:")
     println(langsRanked2)
-
     println(">> langsRanked3:")
     println(langsRanked3)
+    /*
+    * Processing Part 1: naive ranking took 18731 ms.
+    * Processing Part 2: ranking using inverted index took 8004 ms.
+    * Processing Part 3: ranking using reduceByKey took 2939 ms.
+    *
+    * >> langsRanked:
+    * List((JavaScript,1692), (C#,705), (Java,586), (CSS,372), (C++,334), (MATLAB,295), (Python,286), (PHP,279), (Perl,144), (Ruby,120), (Haskell,54), (Objective-C,47), (Scala,43), (Clojure,26), (Groovy,23))
+    * >> langsRanked2:
+    * List((JavaScript,4293), (Java,2547), (CSS,1890), (C#,1650), (C++,1249), (PHP,804), (Python,740), (MATLAB,600), (Perl,360), (Objective-C,344), (Ruby,322), (Haskell,140), (Scala,80), (Groovy,32), (Clojure,30))
+    * >> langsRanked3:
+    * List((JavaScript,4293), (Java,2547), (CSS,1890), (C#,1650), (C++,1249), (PHP,804), (Python,740), (MATLAB,600), (Perl,360), (Objective-C,344), (Ruby,322), (Haskell,140), (Scala,80), (Groovy,32), (Clojure,30))
+    * */
 
     sc.stop()
   }
