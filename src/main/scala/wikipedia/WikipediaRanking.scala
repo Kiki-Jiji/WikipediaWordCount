@@ -117,6 +117,16 @@ object WikipediaRanking {
 
     /* Output the speed of each ranking */
     println(timing)
+
+    println(">> langsRanked:")
+    println(langsRanked)
+
+    println(">> langsRanked2:")
+    println(langsRanked2)
+
+    println(">> langsRanked3:")
+    println(langsRanked3)
+
     sc.stop()
   }
 
