@@ -1,90 +1,105 @@
 
 # Wikipedia Word Count
 
-빅데이터 학습 1주차 결과
 
-## Coursera - 1주차 과제 (Wikipedia Word Count)
+## Coursera 1주차 과제: Wikipedia Word Count
 
 wikipedia 텍스트 데이터로부터 프로그래밍 언어 이름들의 빈도를 세는 Spark 프로그램 구현 과제를 수행한다
 
-아래 경로에서 wikipedia 데이터를 다운받아 src/main/resources/wikipedia 디렉토리에 저장한
+아래 경로에서 wikipedia 데이터를 다운받아 src/main/resources/wikipedia 디렉토리에 저장한다
 
 - task url : https://www.coursera.org/learn/scala-spark-big-data/programming/CfQX2/wikipedia
 - wikipedia data : http://alaska.epfl.ch/~dockermoocs/bigdata/wikipedia.dat
 
-## Spark with Scala - 1주차 과제
 
-Shared Memory Data Parallelism (SDP)와 Distributed Data Parallelism (DDP)의 공통점과 차이점
-    
-    
-    데이터를 병렬적으로 처리한다는 점은 동일하나, SDP의 경우 단일 머신의 메모리 안에서(멀티코어/멀티프로세서) 병렬 처리가 이루어지고, 
-    DDP의 경우 여러 노드/머신에 나눠서 처리함. DDP의 경우 네트워크 비용이 발생하게 되며, latency를 해결해야 함
-    
-    
-분산처리 프레임워크 Hadoop의 Fault Tolerance는 DDP의 어떤 문제를 해결했나요?
-    
-    
-    Hadoop의 Fault Tolerance는 DDP의 문제 중 Partial Failure를 해결했음. 
-    여러 노드 중 한 노드에 이상이 생겨도, 다른 노드로 같은 데이터를 전달시킨 후 작업시켜서 성공할때까지 시도함으로써, 작업의 안정성을 보장함
-    - Partial Failure : crash failures of a subset of the machines involved in a distributed computation
+## Wikipedia
+To start, first download the assignment: wikipedia.zip. For this assignment, you also need to download the data (133 MB):
 
+http://alaska.epfl.ch/~dockermoocs/bigdata/wikipedia.dat
 
-Spark가 하둡과 달리 데이터를 메모리에 저장하면서 개선한 것 무엇이고, 왜 메모리에 저장하면 그것이 개선이 되나요?
-    
-    
-    Hadoop에서는 발생 가능한 failure로부터 복구할 목적으로 모든 map, reduce 과정에서 데이터를 disk에 쓴다. 
-    반면 Spark에서는 disk 대신 in-memory를 이용, disk 쓰기 속도보다 in-memory가 100x 정도 빠르다
+and place it in the folder: src/main/resources/wikipedia in your project directory.
 
+In this assignment, you will get to know Spark by exploring full-text Wikipedia articles.
 
-val ramyons = List("신라면", "틈새라면", "너구리")val kkodulRamyons = ramyons.map(ramyon => "꼬들꼬들 " + ramyon)kkodulRamyonsList.map()을 사용하여 ramyons 리스트에서 kkodulRamyon List를 새로 만들었습니다. kkodulRamyons랑 똑같이 생긴 List를 만드는 Scala 코드를 써주세요
-    
-    
-    val res = List("꼬들꼬들 신라면", "꼬들꼬들 틈새라면", "꼬들꼬들 너구리")
+Gauging how popular a programming language is important for companies judging whether or not they should adopt an emerging programming language. For that reason, industry analyst firm RedMonk has bi-annually computed a ranking of programming language popularity using a variety of data sources, typically from websites like GitHub and StackOverflow. See their top-20 ranking for June 2016 as an example.
 
-val noodles = List(List("신라면", "틈새라면", "너구리"), List("짜파게티", "짜왕", "진짜장"))val flatNoodles = noodles.flatMap(list => list)flatNoodlesList.flatmap()을 사용하여 noodles 리스트에서 flatNoodles List를 새로 만들었습니다. flatNoodles랑 똑같이 생긴 List를 만드는 Scala 코드를 써주세요
-    
-    
-    val res = List("신라면", "틈새라면", "너구리", "짜파게티", "짜왕", "진짜장")
+In this assignment, we'll use our full-text data from Wikipedia to produce a rudimentary metric of how popular a programming language is, in an effort to see if our Wikipedia-based rankings bear any relation to the popular Red Monk rankings.
 
-val jajangs = flatNoodles.filter(noodle => noodle.contains("짜"))jajangsList.filter()를 사용하여 flatNoodles 리스트에서 jajangs List를 새로 만들었습니다.jajangs랑 똑같이 생긴 List를 만드는 Scala 코드를 써주세요
-    
-    
-    val res = List("짜파게티", "짜왕", "진짜장")
+You'll complete this exercise on just one node (your laptop), but you can also head over to Databricks Community Edition to experiment with your code on a "micro-cluster" for free.
 
-val jajangMenu = jajangs.reduce((first, second) => first +"," + second)jajangMenuList.reduce()를 사용하여 jajangs 리스트에서 jajangMenu String을 만들었습니다.jajangMenu랑 똑같이 생긴 String을 만드는 Scala 코드를 써주세요
-    
-    
-    val res = "짜파게티,짜왕,진짜장"
+## Set up Spark
 
-Eager execution와 Lazy execution의 차이점은 무엇인가요?
+For the sake of simplified logistics, we'll be running Spark in "local" mode. This means that your full Spark application will be run on one node, locally, on your laptop.
 
-    Lazy execution은 결과가 바로 계산되지 않음. 
-    Eager execution은 결과가 바로 계산됨. 
-    Spark 의 Transformation 는 lazy execution으로, RDD의 reference만 만들고, Action이 있을 경우에 실제로 수행함
-    - Eager execution : Spark Actions. Compute a result based on an RDD 
-    (result is immediately computed)
-    - Lazy execution : Spark Transformations. Return new RDDs as results
-    (result RDD is not immediately computed)
-    - ** Laziness / Eagerness is how we can limit network communication using the programming model!
+To start, we need a SparkContext. A SparkContext is the "handle" to your cluster. Once you have a SparkContext, you can use it to create and populate RDDs with data.
 
-Transformation과 Action의 결과물 (Return Type)은 어떻게 다를까요?
-    
-    
-    Transformation의 return type은 RDD, Action의 return type은 RDD가 아님.
-    연산에 대한 결과물 혹은 파일(e.g. HDFS)
+To create a SparkContext, you need to first create a SparkConfig instance. A SparkConfig represents the configuration of your Spark application. It's here that you must specify that you intend to run your application in "local" mode. You must also name your Spark application at this point. For help, see the Spark API Docs.
+
+Configure your cluster to run in local mode by implementing val conf and val sc.
+
+## Read-in Wikipedia Data
+
+There are several ways to read data into Spark. The simplest way to read in data is to convert an existing collection in memory to an RDD using the parallelize method of the Spark context.
+
+We have already implemented a method parse in the object WikipediaData object that parses a line of the dataset and turns it into a WikipediaArticle.
+
+Create an RDD (by implementing val wikiRdd) which contains the WikipediaArticle objects of articles.
+
+## Compute a ranking of programming languages
+We will use a simple metric for determining the popularity of a programming language: the number of Wikipedia articles that mention the language at least once.
+
+### Rank languages attempt #1: rankLangs
+
+#### Computing occurrencesOfLang
+
+Start by implementing a helper method occurrencesOfLang which computes the number of articles in an RDD of type RDD[WikipediaArticles] that mention the given language at least once. For the sake of simplicity we check that it least one word (delimited by spaces) of the article text is equal to the given language.
+
+#### Computing the ranking, rankLangs
+
+Using occurrencesOfLang, implement a method rankLangs which computes a list of pairs where the second component of the pair is the number of articles that mention the language (the first component of the pair is the name of the language).
+
+An example of what rankLangs might return might look like this, for example:
 
 
-RDD.cache()는 어떤 작동을 하고, 언제 쓰는 것이 좋은가?
-    
-    
-    evaluate된 RDD를 메모리에 저장하여 이후에 다시 사용할 수 있음. 
-    한 RDD를 여러 action의 input으로 쓸 때 이렇게 하면 중복 계산 작업을 막을 수 있다. 
-    특히 iteration 에서 반복적으로 사용되는 경우 메모리에 올려놓고 사용하는게 유리함.
-    
+    List(("Scala", 999999), ("JavaScript", 1278), ("LOLCODE", 982), ("Java", 42))
 
-Lazy Execution이 Eager Execution 보다 더 빠를 수 있는 예를 얘기해주세요.
-    
-    
-    Eager execution은 여러 단계의 연산을 수행 할 때, 한 단계씩 차례차례 진행하는 반면, lazy execution은 한번에 진행한다. 
-    Lazy execution 과정에서는 모든 단계를 고려한 최적화 작업이 자동으로 이루어지는데, 
-    그 과정에서 필요없는 연산은 생략 되는 등의 효과가 있기 때문에 각 단계를 무조건 수행하는 eager execution 보다 빠를 수 있다.
+
+The list should be sorted in descending order. That is, according to this ranking, the pair with the highest second component (the count) should be the first element of the list.
+
+Pay attention to roughly how long it takes to run this part! (It should take tens of seconds.)
+
+### Rank languages attempt #2: rankLangsUsingIndex
+
+#### Compute an inverted index
+
+An inverted index is an index data structure storing a mapping from content, such as words or numbers, to a set of documents. In particular, the purpose of an inverted index is to allow fast full text searches. In our use-case, an inverted index would be useful for mapping from the names of programming languages to the collection of Wikipedia articles that mention the name at least once.
+
+To make working with the dataset more efficient and more convenient, implement a method that computes an "inverted index" which maps programming language names to the Wikipedia articles on which they occur at least once.
+
+Implement method makeIndex which returns an RDD of the following type: RDD[(String, Iterable[WikipediaArticle])]. This RDD contains pairs, such that for each language in the given langs list there is at most one pair. Furthermore, the second component of each pair (the Iterable) contains the WikipediaArticles that mention the language at least once.
+
+Hint: You might want to use methods flatMap and groupByKey on RDD for this part.
+
+#### Computing the ranking, rankLangsUsingIndex
+
+Use the makeIndex method implemented in the previous part to implement a faster method for computing the language ranking.
+
+Like in part 1, rankLangsUsingIndex should compute a list of pairs where the second component of the pair is the number of articles that mention the language (the first component of the pair is the name of the language).
+
+Again, the list should be sorted in descending order. That is, according to this ranking, the pair with the highest second component (the count) should be the first element of the list.
+
+Hint: method mapValues on PairRDD could be useful for this part.
+
+Can you notice a performance improvement over attempt #2? Why?
+
+### Rank languages attempt #3: rankLangsReduceByKey
+
+In the case where the inverted index from above is only used for computing the ranking and for no other task (full-text search, say), it is more efficient to use the reduceByKey method to compute the ranking directly, without first computing an inverted index. Note that the reduceByKey method is only defined for RDDs containing pairs (each pair is interpreted as a key-value pair).
+
+Implement the rankLangsReduceByKey method, this time computing the ranking without the inverted index, using reduceByKey.
+
+Like in part 1 and 2, rankLangsReduceByKey should compute a list of pairs where the second component of the pair is the number of articles that mention the language (the first component of the pair is the name of the language).
+
+Again, the list should be sorted in descending order. That is, according to this ranking, the pair with the highest second component (the count) should be the first element of the list.
+
+Can you notice an improvement in performance compared to measuring both the computation of the index and the computation of the ranking as we did in attempt #2? If so, can you think of a reason?
